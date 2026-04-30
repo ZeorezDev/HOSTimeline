@@ -1,0 +1,27 @@
+name: HosTimeline
+version: '1.0.0'
+main: com.hosserver.timeline.HosTimeline
+api-version: '1.20'
+description: WW2 alternative history timeline engine for HOS Server
+authors: [ HOS-Dev ]
+
+commands:
+  hostime:
+    description: HOS Timeline main command
+    usage: /hostime <show|set|advance|pause|resume|reload>
+    permission: hostime.use
+    aliases: [ ht ]
+
+permissions:
+  hostime.use:
+    description: View current timeline date
+    default: op
+  hostime.admin:
+    description: Manage the timeline (set, advance, pause, resume, reload)
+    default: op
+  hostime.*:
+    description: All timeline permissions
+    default: op
+    children:
+      hostime.use: true
+      hostime.admin: true

@@ -1,0 +1,179 @@
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║  HOS Timeline — Örnek Event Tanımları                                       ║
+# ║  Değişiklikler /hostime reload ile aktif olur.                              ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+#
+# ► Tüm alanlar için bkz. README.md → "Event Yazma Rehberi" bölümü.
+#
+# ── Hızlı başvuru ─────────────────────────────────────────────────────────────
+#  type    : BROADCAST | CONSOLE_COMMAND | SET_FLAG
+#  date    : "YYYY-MM-DD"
+#  repeatable: false (varsayılan) → bir kez tetiklenir
+#             true              → tarih her geçildiğinde tetiklenir
+#
+#  Koşul operatörleri:
+#    EQUALS (varsayılan) — flag değeri eşit olmalı
+#    NOT_EQUALS          — flag değeri farklı olmalı
+#    EXISTS              — flag anahtarı var olmalı (herhangi değer)
+#    NOT_EXISTS          — flag anahtarı hiç olmamalı
+#
+#  Broadcast yer tutucuları: {date}  {year}  {month}  {day}  {event_id}
+# ──────────────────────────────────────────────────────────────────────────────
+
+events:
+
+  # ════════════════════════════════════════════════════════════════════════════
+  #  1936
+  # ════════════════════════════════════════════════════════════════════════════
+
+  # 1 ── SET_FLAG: Almanya'nın yeniden silahlanması
+  #      Flag ayarla → sonraki koşullu eventler bunu kontrol edebilir.
+  - id: flag_germany_rearmed
+    date: "1936-03-07"
+    type: SET_FLAG
+    repeatable: false
+    payload:
+      flag: germany_rearmed
+      value: "true"
+    conditions: []
+
+  # 2 ── BROADCAST: Ren Bölgesi bildirimi — {year} yer tutucusu kullanımı
+  - id: rhineland_broadcast
+    date: "1936-03-07"
+    type: BROADCAST
+    repeatable: false
+    payload:
+      message: "&e[{year}] Almanya Ren Bölgesi'ni yeniden işgal etti."
+    conditions: []
+
+  # 3 ── BROADCAST: Özel prefix ile diplomatik haber
+  - id: anti_comintern_pact
+    date: "1936-11-25"
+    type: BROADCAST
+    repeatable: false
+    payload:
+      prefix: "&8[&bDiplomasi&8] &r"
+      message: "&7Almanya–Japonya Anti-Komintern Paktı imzalandı."
+    conditions: []
+
+  # ════════════════════════════════════════════════════════════════════════════
+  #  1938
+  # ════════════════════════════════════════════════════════════════════════════
+
+  # 4 ── SET_FLAG: Avusturya ilhakı bayrağı
+  - id: flag_anschluss
+    date: "1938-03-12"
+    type: SET_FLAG
+    repeatable: false
+    payload:
+      flag: austria_status
+      value: "annexed"
+    conditions: []
+
+  # 5 ── BROADCAST: EXISTS koşulu — Ren bayrağı varsa tetiklenir
+  - id: anschluss_broadcast
+    date: "1938-03-12"
+    type: BROADCAST
+    repeatable: false
+    payload:
+      prefix: "&c[{year}] "
+      message: "&eAlmanya Avusturya'yı ilhak etti. Anschluss gerçekleşti."
+    conditions:
+      - flag: germany_rearmed
+        operator: EXISTS          # değer ne olursa olsun, bayrak var mı?
+
+  # 6 ── BROADCAST: Koşulsuz — Münih Anlaşması
+  - id: munich_agreement
+    date: "1938-09-30"
+    type: BROADCAST
+    repeatable: false
+    payload:
+      message: "&eMünih Anlaşması imzalandı. Südetler Almanya'ya bırakıldı."
+    conditions: []
+
+  # ════════════════════════════════════════════════════════════════════════════
+  #  1939
+  # ════════════════════════════════════════════════════════════════════════════
+
+  # 7 ── SET_FLAG: Savaş bayrağı — sonraki eventlerin koşulunu sağlar
+  #      NOT: Aynı tarihteki broadcast'ten ÖNCE gelecek şekilde sıralanmalı.
+  - id: flag_ww2_active
+    date: "1939-09-01"
+    type: SET_FLAG
+    repeatable: false
+    payload:
+      flag: ww2_active
+      value: "true"
+    conditions: []
+
+  # 8 ── BROADCAST: Savaş ilanı — {date} formatlanmış tarihi gösterir
+  - id: ww2_start
+    date: "1939-09-01"
+    type: BROADCAST
+    repeatable: false
+    payload:
+      prefix: "&4&l[SAVAŞ] &r"
+      message: "&c{date} — Almanya Polonya'yı işgal etti. İkinci Dünya Savaşı başladı!"
+    conditions: []
+
+  # 9 ── CONSOLE_COMMAND: EQUALS koşulu — yalnızca ww2_active="true" ise çalışır
+  - id: war_mode_command
+    date: "1939-09-01"
+    type: CONSOLE_COMMAND
+    repeatable: false
+    payload:
+      commands:
+        - "say [Timeline] Savaş protokolleri devreye alindi."
+    conditions:
+      - flag: ww2_active
+        value: "true"             # EQUALS varsayılan — operatör belirtmeye gerek yok
+
+  # 10 ── BROADCAST: Çoklu koşul — EXISTS + NOT_EQUALS bir arada
+  - id: poland_fallen
+    date: "1939-10-06"
+    type: BROADCAST
+    repeatable: false
+    payload:
+      message: "&7Polonya direnişi çöktü. Ülke işgal altında."
+    conditions:
+      - flag: ww2_active
+        operator: EXISTS           # savaş aktif mi?
+      - flag: poland_status
+        value: "liberated"
+        operator: NOT_EQUALS       # Polonya henüz kurtarılmadıysa
+
+  # ════════════════════════════════════════════════════════════════════════════
+  #  Ek örnekler — kullanmak için başındaki # işaretlerini kaldırın
+  # ════════════════════════════════════════════════════════════════════════════
+
+  # repeatable: true — tarih her geçildiğinde tetiklenir (örn. yıl mesajı)
+  # - id: yearly_war_reminder
+  #   date: "1940-01-01"
+  #   type: BROADCAST
+  #   repeatable: true
+  #   payload:
+  #     message: "&7{year} yılına girildi. Savaş hâlâ devam ediyor."
+  #   conditions:
+  #     - flag: ww2_active
+  #       operator: EXISTS
+
+  # NOT_EXISTS — barış anlaşması imzalanmamışsa tetiklenir
+  # - id: war_escalation
+  #   date: "1940-05-10"
+  #   type: BROADCAST
+  #   repeatable: false
+  #   payload:
+  #     message: "&cAlmanya Fransa'ya saldırdı."
+  #   conditions:
+  #     - flag: peace_treaty
+  #       operator: NOT_EXISTS
+
+  # permission_filter — sadece belirli izne sahip oyunculara mesaj
+  # - id: officer_briefing
+  #   date: "1939-09-03"
+  #   type: BROADCAST
+  #   repeatable: false
+  #   payload:
+  #     message: "&7[Subay] Savaş planları dağıtıldı."
+  #     permission_filter: "hos.officer"
+  #   conditions: []

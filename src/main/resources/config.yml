@@ -1,0 +1,35 @@
+timeline:
+  # Sunucunun ilk kez başlayacağı tarih.
+  # Bu değer yalnızca server_date.yml yoksa kullanılır.
+  # Sonraki başlangıçlarda server_date.yml'deki değer geçerlidir.
+  start_date:
+    year: 1936
+    month: 1
+    day: 1
+
+  auto_advance:
+    # true ise plugin, belirtilen aralıkta tarihi otomatik ilerletir.
+    enabled: false
+    # Kaç tick'te bir ilerlesin? 72000 = 1 saat gerçek süre.
+    interval_ticks: 72000
+    # Her tetiklemede kaç oyun günü eklensin?
+    days_per_advance: 1
+
+  safety:
+    # /hostime advance <gün> ile ilerlenebilecek maksimum gün.
+    # 0 = sınır yok (üretim ortamında önerilmez).
+    max_advance_days: 3650
+
+    # Tarihin geçebileceği yıl aralığı. Bu sınırın dışına çıkma girişimi reddedilir.
+    min_year: 1900
+    max_year: 2100
+
+messages:
+  # Komut geri bildirimlerinde görünen plugin öneki.
+  prefix: "&8[&6HOS Timeline&8] &r"
+
+  # Her BROADCAST eventine uygulanan global şablon.
+  # Mutlaka {message} içermeli. {year}, {date}, {event_id} de çalışır.
+  # Örnek:  "&8[&e{year}&8] {message}"  → "[1939] ..."
+  # Varsayılan: "{message}" (saf geçiş — ek sarmalama yok)
+  broadcast_format: "&8[&e{year}&8] {message}"
