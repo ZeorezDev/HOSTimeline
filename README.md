@@ -73,7 +73,6 @@ HOS Timeline can be used for:
 
 This project is built for Mohist `1.20.1`. Compatibility with other server platforms is not guaranteed.
 
-### GitHub README’ye Eklenebilecek “Technical Overview”
 
 #### Technical Overview
 
